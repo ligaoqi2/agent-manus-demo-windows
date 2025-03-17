@@ -1,0 +1,10 @@
+llama-index-llms-langchain
+llama-index-core
+llama-index-llms-openai
+langchain-openai
+llama-index-llms-ollama
+langchain-community
+openai
+python-dotenv
+aiohttp
+docker
