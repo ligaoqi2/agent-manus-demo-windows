@@ -34,6 +34,9 @@ deb-src http://mirrors.aliyun.com/debian/ bookworm-updates main non-free contrib
         fonts-liberation \
         libappindicator3-1 \
         xdg-utils \
+        x11vnc \
+        git \
+        netcat-openbsd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -53,6 +56,7 @@ RUN chmod +x /start.sh
 
 # 创建工作目录
 WORKDIR /app
+RUN git clone https://github.com/novnc/noVNC.git /app/noVNC
 
 # 复制agent_browser.py
 COPY agent_browser.py .

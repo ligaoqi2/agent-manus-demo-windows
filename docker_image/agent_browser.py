@@ -37,7 +37,7 @@ async def run_browser_agent(task, model_name="gpt4o-mini", use_vision=True, max_
     try:
         # 创建代理
         agent = Agent(
-            task=task,
+            task="转到 www.baidu.com，去搜索" + task,
             llm=llm,
             use_vision=use_vision,
             max_failures=max_failures,

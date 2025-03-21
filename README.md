@@ -1,137 +1,135 @@
-# Agent Manus Demo - For Windows
+# Agent Manus Demo - For windows
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-Required-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-### 感谢江苏慧问信息科技公司 [公众号文章](https://mp.weixin.qq.com/s/zGXMpq15xYGmWll8m1qa5w) 及其开源项目 [Agent-Manus](https://github.com/pingcy/agent-manus#)
+English | [中文](./docs/README_zh.md)
 
-* 一个基于LLM的多用户智能Agent演示系统，针对 **windows**
-* 能够在动态启动的容器中执行代码、脚本、网络自动化浏览等工具，以完成输入任务。
+## Update:
+* 2025.03.21 : Add X11, noVNC support for native screen to Xvfb browser_use calls to AI process
+* 2025.03.17 : Configure Windows executable version
 
-## 使用效果
-1. 执行 "生成一个更加美化的html个人主页" 指令后
-![效果](./image/README/result1.png)
+### Thanks to Huiwen Information Technology Co., Ltd. and its open source project: [Agent-Manus](https://github.com/pingcy/agent-manus#)
+
+* A multi-user intelligent agent demonstration system based on LLM for **windows**
+* Able to execute code, scripts, network automation browsing and other tools in dynamically launched containers to complete input tasks.
+
+## Results
+1. After executing the "Generate a more beautiful html personal homepage" command
+![效果](docs/image/result1.png)
 
 
-2. 生成的html个人主页
-![效果](./image/README/result2.png)
+2. Generated html personal homepage
+![效果](docs/image/result2.png)
 
-##  功能特点
 
--  支持多用户隔离
--  集成代码执行环境（Docker）
--  支持自动化网络浏览
--  智能代码生成与执行
--  可扩展的工具系统
+3. The process of browser_use calling AI as shown on the native screen.(Q: travel plans in Hawaii)
 
-## 环境要求
+Automatically open http://localhost:3000/vnc.html?autoconnect=true and display:
+<div style="display: flex; gap: 10px;">
+    <img src="docs/image/screen1.png" width="200px">
+    <img src="docs/image/screen2.png" width="200px">
+</div>
+
+##  Features
+
+- Support for multi-user isolation
+- Integrated code execution environment (Docker)
+- Support for automated network browsing
+- Intelligent code generation and execution
+- Extensible tool system
+
+## ENV
 
 - Python 3.9+
 - Docker
-- 操作系统：Windows，其他系统可参照 [原作者Github](https://github.com/pingcy/agent-manus#)
+- OS：Windows, Other OS could refer to [Github of the Agent Manus](https://github.com/pingcy/agent-manus#)
 
-##  快速开始
+##  Quick Start
 
-1. 克隆项目：
+1. Clone this repo：
 
 ```bash
 git clone https://github.com/ligaoqi2/agent-manus-demo-windows.git
 cd agent-manus-demo-windows
 ```
 
-2. 安装依赖：
+2. Dependencies：
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. 构建Docker镜像：
+3. Docker build：
 
-在 docker_image/build.sh 中设置镜像所用的 AI 模型
+* Config the AI model used in docker_image/build.sh
 
-个人所用为 gpt-4o-mini
-
-没有海外账户，可以 [wildcard](https://bewildcard.com/service) 里的 zfb 买一个
-![wildcard](./image/README/wildcard.png)
+* Use gpt-4o-mini by default
 
 ```shell
 # docker_image/build.sh
 # line 8
-OPENAI_API_KEY="自己的 API"
-OPENAI_API_BASE="API 对应链接"
+OPENAI_API_KEY="Your own OpenAI API"
+OPENAI_API_BASE="API URL"
 ```
 
-执行构建
+* Build
 ```bash
 cd docker_image
-dos2unix start.sh     # windows到 linux 中的 sh文件 回车需要转换
+dos2unix start.sh
 sh build.sh
 ```
 
-[国内docker镜像](https://zhuanlan.zhihu.com/p/28662850275)配置
-```json
-{
-    "registry-mirrors": [
-    "https://docker.m.daocloud.io",
-    "https://docker.imgdb.de",
-    "https://docker-0.unsee.tech",
-    "https://docker.hlmirror.com",
-    "https://cjie.eu.org"
-    ]
-}
-```
-个人采用 docker desktop，配置如下
-![](./image/README/docker-config.png)
+4. Modify the Docker mapping path
 
-4. 修改 docker 映射路径
-修改 tool_code_executor.py 与 tool_webpage_crawler.py 中的 本地工作目录 BASE_WORK_DIR 为自己 windows 中的目录
 ```python
+# tool_code_executor.py 
+# tool_webpage_crawler.py 
 BASE_WORK_DIR = "C:\\Users\\XXX\\agent-manus\\workspace\\tasks"
 ```
-CONTAINER_DIR 是映射到容器内的路径，与 BASE_WORK_DIR 内容相同，可不修改
 
-5. 修改本地模型的 api_key，base_url 还有 model_name
+5. Modify the local AI model's api_key，base_url and model_name
 ```python
 /* agent_main.py */
 # line 29
-api_key = "本地模型 API"
-base_url = "API 链接"
+api_key = "local model API"
+base_url = "API url"
 # line 52
-llm = LangChainLLM(llm=ChatOpenAI(model="模型名XXX", openai_api_key=api_key, openai_api_base=base_url))
+llm = LangChainLLM(llm=ChatOpenAI(model="XXX", openai_api_key=api_key, openai_api_base=base_url))
 
 /* tools_code_executor.py */
 # line 8
-api_key = "本地模型 API"
-base_url = "API 链接"
+api_key = "local model API"
+base_url = "API url"
 
 # line 12
 def create_code_generator_tool(
-        model_name: str = "模型名XXX"
+        model_name: str = "XXX"
 ) -> FunctionTool:
 ```
 
-6. 运行程序：
+6. Run
 
 ```bash
 python agent_main.py
 ```
 
-##  使用说明
+##  Instructions
 
-1. 启动程序后输入用户ID（可选，直接回车默认为default）
-2. 输入要执行的任务描述
-3. 如需处理文件，输入文件名（可选，文件应位于用户目录下的data目录下，直接回车默认无）
+1. After starting the program, enter the user ID (optional, press Enter to set the default)
+2. Enter a description of the task to be performed
+3. If you need to process a file, enter the file name (optional, the file should be located in the data directory under the user directory, press Enter directly by default)
 
 
-##  许可证
+##  License
 
 MIT License
 
-##  致谢
-<img src="./image/README/qrcode.jpg" width="200" height="200">
+##  Acknowledgments
+<img src="docs/image/qrcode.jpg" width="200" height="200">
 
-## 欢迎探讨
+## Contact
 ```
 ligaoqi02@gmail.com
 ```

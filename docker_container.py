@@ -3,6 +3,9 @@ import tempfile
 import docker
 import uuid
 from typing import Dict, Optional
+import time
+import requests
+from selenium import webdriver
 
 
 class DockerContainer:
@@ -42,7 +45,8 @@ class DockerContainer:
                     working_dir=self.container_dir,
                     name=self.container_name,
                     auto_remove=self.auto_remove,
-                    volumes={self.base_work_dir: {'bind': self.container_dir, 'mode': 'rw'}}
+                    volumes={self.base_work_dir: {'bind': self.container_dir, 'mode': 'rw'}},
+                    ports={"6080": 3000}
                 )
                 print(f"创建新容器 {self.container_name}")
         except Exception as e:
@@ -83,6 +87,11 @@ class DockerContainer:
         """
         if not self.container:
             self.start()
+
+        if self.wait_for_service():
+            self.open_browser()
+        else:
+            raise RuntimeError("服务启动失败")
 
         # 使用指定工作目录或当前工作目录
         execution_dir = work_dir if work_dir else self.current_work_dir
@@ -133,5 +142,25 @@ class DockerContainer:
             # 清理临时文件
             if temp_file and os.path.exists(temp_file):
                 os.unlink(temp_file)
-
+            self.close_browser()
         return result
+
+    def open_browser(self):
+        self.driver = webdriver.Chrome()
+        self.driver.get('http://localhost:3000/vnc.html?autoconnect=true')
+
+    def close_browser(self):
+        if self.driver:
+            self.driver.close()
+
+    def wait_for_service(self, url="http://localhost:3000/vnc.html", timeout=60):
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                response = requests.get(url)
+                if response.status_code == 200:
+                    return True
+            except requests.exceptions.RequestException:
+                pass
+            time.sleep(1)
+        return False
